@@ -33,6 +33,9 @@ import csv
 import datetime
 
 import numpy as np
+import matplotlib
+matplotlib.use("Agg")  # backend che salva su file (non apre finestre)
+import matplotlib.pyplot as plt
 
 from dense_layer import DenseLayer
 
@@ -62,6 +65,34 @@ def feature_data(anno, mese, giorno, ordinale_inizio):
     dow_sin = np.sin(2 * np.pi * dow / 7)
     dow_cos = np.cos(2 * np.pi * dow / 7)
     return [trend, mese_sin, mese_cos, dow_sin, dow_cos]
+
+
+def disegna_risultati(storico_loss, y_test, pred_test, rmse, file_png="risultati_click.png"):
+    """Crea due grafici: la curva della loss e il confronto previsto vs reale."""
+    fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(13, 5))
+
+    # 1) Curva della loss: deve SCENDERE man mano che la rete impara.
+    ax1.plot(storico_loss, color="tab:blue")
+    ax1.set_title("Apprendimento: la loss scende")
+    ax1.set_xlabel("epoca")
+    ax1.set_ylabel("loss (errore, normalizzato)")
+    ax1.grid(True, alpha=0.3)
+
+    # 2) Previsto vs reale: piu' i punti stanno sulla diagonale, meglio e'.
+    veri = y_test.ravel()
+    prev = pred_test.ravel()
+    ax2.scatter(veri, prev, s=12, alpha=0.4, color="tab:orange")
+    lim = max(veri.max(), prev.max())
+    ax2.plot([0, lim], [0, lim], "k--", linewidth=1, label="previsione perfetta")
+    ax2.set_title(f"Click previsti vs reali (RMSE = {rmse:,.0f})")
+    ax2.set_xlabel("click reali")
+    ax2.set_ylabel("click previsti")
+    ax2.legend()
+    ax2.grid(True, alpha=0.3)
+
+    fig.tight_layout()
+    fig.savefig(file_png, dpi=110)
+    print(f"Grafico salvato in '{file_png}'")
 
 
 def main():
@@ -133,10 +164,12 @@ def main():
 
     learning_rate = 0.5
     epoche = 8000
+    storico_loss = []   # salviamo la loss a ogni epoca per disegnarla dopo
     print("Alleno la rete a prevedere i click...\n")
     for epoca in range(1, epoche + 1):
         pred = forward(Xtr)
         loss = np.mean((pred - ytr) ** 2)
+        storico_loss.append(loss)
         d = 2.0 * (pred - ytr) / len(ytr)
         d = layer3.backward(d)
         d = layer2.backward(d)
@@ -156,6 +189,9 @@ def main():
     mae = np.mean(np.abs(errori))
     print(f"\n>>> Errore sui dati di TEST (mai visti):")
     print(f"    RMSE = {rmse:,.1f} click   |   MAE = {mae:,.1f} click\n")
+
+    # --- VISUALIZZAZIONE dei risultati (salvata in PNG) ---
+    disegna_risultati(storico_loss, y_test, pred_test, rmse)
 
     # --- Funzione pronta per prevedere un CASO NUOVO ---
     def previsione(anno, mese, giorno, parola_chiave):
