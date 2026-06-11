@@ -1,2 +1,5 @@
 __pycache__/
 *.pyc
+
+# dataset generato localmente (rigeneralo con crea_dati_esempio.py)
+dati_esempio.csv
