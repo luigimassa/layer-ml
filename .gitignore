@@ -3,3 +3,4 @@ __pycache__/
 
 # dataset generato localmente (rigeneralo con crea_dati_esempio.py)
 dati_esempio.csv
+dati_keyword.csv

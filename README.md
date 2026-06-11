@@ -34,6 +34,11 @@ a = activation(z)       # funzione di attivazione (non-linearita')
   legge un CSV e impara a prevedere un numero. Vedi sotto.
 - **`crea_dati_esempio.py`** — genera `dati_esempio.csv`, un dataset finto
   (prezzi di case) che mostra il formato richiesto.
+- **`esempio_click.py`** — caso reale: prevede i **click futuri** di una
+  parola chiave (stile Search Console) da **data + parola chiave**. Mostra
+  due tecniche chiave: *feature dalla data* e *target encoding* del testo.
+- **`crea_dati_keyword.py`** — genera `dati_keyword.csv`, uno storico finto
+  con anno/mese/giorno/parola_chiave/impressioni/click.
 
 ## Come si usa
 
@@ -133,6 +138,34 @@ sui dati mai visti (RMSE e MAE, nella stessa unita' del target).
   riduci i neuroni o le epoche.
 - Numero di neuroni e di layer si cambiano dove la rete viene costruita
   (`layer1`, `layer2`, `layer3`).
+
+## Caso reale: prevedere i click da data + parola chiave
+
+`esempio_click.py` affronta un problema concreto: hai uno storico
+(stile Search Console / Google Ads) con `anno, mese, giorno, parola_chiave,
+impressioni, click` e vuoi prevedere i **click futuri** di una parola chiave.
+Non usiamo le impressioni come input, perche' nel futuro non le conosci ancora.
+
+Prova subito:
+
+```bash
+python3 crea_dati_keyword.py   # genera lo storico di esempio (14.600 righe)
+python3 esempio_click.py
+```
+
+Introduce due tecniche fondamentali quando i dati non sono "solo numeri puliti":
+
+- **Feature dalla data.** Anno/mese/giorno grezzi dicono poco. Estraiamo il
+  *giorno della settimana* (i click hanno un ciclo settimanale) e la
+  *stagionalita'* mensile, rappresentata con seno/coseno cosi' che dicembre e
+  gennaio risultino "vicini" come su un orologio.
+- **Target encoding** del testo. Con migliaia di parole chiave non si puo'
+  creare una colonna per ciascuna. Ogni parola viene rappresentata dalla sua
+  **media storica di click** (calcolata solo sul training, per non barare) e
+  dalla sua frequenza. Cosi' la rete "conosce" il rendimento di ogni keyword.
+
+Alla fine lo script espone una funzione `previsione(anno, mese, giorno,
+parola_chiave)` gia' pronta per stimare i click di un caso nuovo.
 
 ### Per la classificazione
 
