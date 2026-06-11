@@ -26,15 +26,19 @@ a = activation(z)       # funzione di attivazione (non-linearita')
   (backpropagation) e `update` (discesa del gradiente), piu' le funzioni di
   attivazione (ReLU, sigmoid, tanh, lineare). Tutto commentato in italiano.
 - **`esempio.py`** — una piccola rete a due layer che impara il problema
-  **XOR**. Mostra la loss scendere epoca dopo epoca.
+  **XOR** (esempio "giocattolo" per capire il meccanismo).
+- **`esempio_cifre.py`** — esempio **concreto**: una rete che riconosce
+  **cifre scritte a mano** (immagini reali 8x8). Raggiunge ~96% di
+  accuratezza su immagini mai viste e disegna le cifre in ASCII art.
 
 ## Come si usa
 
 ```bash
 pip install -r requirements.txt
 
-python3 dense_layer.py   # mini-demo del solo forward pass
-python3 esempio.py       # allena una rete sullo XOR
+python3 dense_layer.py     # mini-demo del solo forward pass
+python3 esempio.py         # allena una rete sullo XOR (esempio giocattolo)
+python3 esempio_cifre.py   # CONCRETO: riconosce cifre scritte a mano
 ```
 
 ### Creare e usare un layer
